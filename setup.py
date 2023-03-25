@@ -52,6 +52,7 @@ setup(
         "azure-mgmt-resource>=10.2.0",
         "azure-mgmt-cosmosdb>=6.0.0",
         "msrestazure >= 0.6.4",
+        "azure-mgmt-security>=3.0.0",
         "azure-mgmt-storage>=16.0.0",
         "azure-mgmt-sql<=1.0.0",
         "azure-identity>=1.5.0",

@@ -436,6 +436,8 @@ CREATE INDEX IF NOT EXISTS FOR (n:AzureDisk) ON (n.id);
 CREATE INDEX IF NOT EXISTS FOR (n:AzureDisk) ON (n.lastupdated);
 CREATE INDEX IF NOT EXISTS FOR (n:AzureSnapshot) ON (n.id);
 CREATE INDEX IF NOT EXISTS FOR (n:AzureSnapshot) ON (n.lastupdated);
+CREATE INDEX IF NOT EXISTS FOR (n:AzureSubAssessment) ON (n.id);
+CREATE INDEX IF NOT EXISTS FOR (n:AzureSubAssessment) ON (n.lastupdated);
 CREATE INDEX IF NOT EXISTS FOR (n:KubernetesCluster) ON (n.id);
 CREATE INDEX IF NOT EXISTS FOR (n:KubernetesCluster) ON (n.name);
 CREATE INDEX IF NOT EXISTS FOR (n:KubernetesCluster) ON (n.lastupdated);
