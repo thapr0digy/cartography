@@ -92,7 +92,7 @@ def load_sub_assessment_data(
     ingest_sub_assessment = """
     UNWIND $sub_assessment_list AS sa
     MERGE (s:AzureSubAssessment{id: sa.id})
-    ON CREATE SET s.firstseen = timestamp() / 1000,
+    ON CREATE SET s.firstseen = timestamp(),
     s.type = sa.type, s.resourcegroup = sa.resourceGroup
     SET s.lastupdated = $azure_update_tag,
     s.name = sa.name, s.id_properties_id = sa.id_properties_id,

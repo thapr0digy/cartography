@@ -49,6 +49,7 @@ setup(
         "adal>=1.2.4",
         "azure-cli-core>=2.26.0",
         "azure-mgmt-compute>=5.0.0",
+        "azure-mgmt-network>=22.3.0",
         "azure-mgmt-resource>=10.2.0",
         "azure-mgmt-cosmosdb>=6.0.0",
         "msrestazure >= 0.6.4",
