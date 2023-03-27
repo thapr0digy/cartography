@@ -7,6 +7,7 @@ from . import function_app
 from . import iam
 from . import key_vaults
 from . import network
+from . import securitycenter
 from . import sql
 from . import storage
 
@@ -19,6 +20,7 @@ RESOURCE_FUNCTIONS: Dict = {
     'key_vaults': key_vaults.sync,
     'compute': compute.sync,
     'network': network.sync,
+    'securitycenter':securitycenter.sync,
     'sql': sql.sync,
     'storage': storage.sync,
 }

@@ -5,14 +5,6 @@ from typing import Optional
 
 import neo4j
 
-<<<<<<< HEAD
-from . import compute
-from . import cosmosdb
-from . import securitycenter
-from . import sql
-from . import storage
-=======
->>>>>>> 8e77e107ef94c03fc325a27584aa290d2d6b9daf
 from . import subscription
 from . import tag
 from . import tenant
@@ -31,13 +23,6 @@ def _sync_one_subscription(
     requested_syncs: List[str],
     common_job_parameters: Dict,
 ) -> None:
-<<<<<<< HEAD
-    compute.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
-    cosmosdb.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
-    sql.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
-    storage.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
-    securitycenter.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
-=======
     tag.cleanup_tags(neo4j_session, common_job_parameters)
     for request in requested_syncs:
         if request in RESOURCE_FUNCTIONS:
@@ -55,7 +40,6 @@ def _sync_one_subscription(
 
     # call tag.sync() at the last, don't change position of tag.sync()
     tag.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
->>>>>>> 8e77e107ef94c03fc325a27584aa290d2d6b9daf
 
 
 def _sync_tenant(

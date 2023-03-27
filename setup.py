@@ -66,7 +66,7 @@ setup(
         "azure-mgmt-resource>=10.2.0",
         "azure-mgmt-network>=2.7.0",
         "azure-mgmt-web>=0.35.0",
-        "kubernetes>=18.20.0,<=21.7.0",
+        "kubernetes>=26.1.0",
         "pdpyras>=4.3.0",
         "crowdstrike-falconpy>=0.5.1",
         "python-dateutil",
