@@ -5,16 +5,22 @@ from typing import Optional
 
 import neo4j
 
+<<<<<<< HEAD
 from . import compute
 from . import cosmosdb
 from . import securitycenter
 from . import sql
 from . import storage
+=======
+>>>>>>> 8e77e107ef94c03fc325a27584aa290d2d6b9daf
 from . import subscription
+from . import tag
 from . import tenant
+from .resources import RESOURCE_FUNCTIONS
 from .util.credentials import Authenticator
 from .util.credentials import Credentials
 from cartography.config import Config
+from cartography.intel.azure.util.common import parse_and_validate_azure_requested_syncs
 from cartography.util import timeit
 
 logger = logging.getLogger(__name__)
@@ -22,13 +28,34 @@ logger = logging.getLogger(__name__)
 
 def _sync_one_subscription(
     neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str, update_tag: int,
+    requested_syncs: List[str],
     common_job_parameters: Dict,
 ) -> None:
+<<<<<<< HEAD
     compute.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
     cosmosdb.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
     sql.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
     storage.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
     securitycenter.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
+=======
+    tag.cleanup_tags(neo4j_session, common_job_parameters)
+    for request in requested_syncs:
+        if request in RESOURCE_FUNCTIONS:
+            if request == 'iam':
+                RESOURCE_FUNCTIONS[request](
+                    neo4j_session, credentials, credentials.tenant_id, update_tag, common_job_parameters,
+                )
+            else:
+                RESOURCE_FUNCTIONS[request](
+                    neo4j_session, credentials.arm_credentials,
+                    subscription_id, update_tag, common_job_parameters,
+                )
+        else:
+            raise ValueError(f'Azure sync function "{request}" was specified but does not exist. Did you misspell it?')
+
+    # call tag.sync() at the last, don't change position of tag.sync()
+    tag.sync(neo4j_session, credentials.arm_credentials, subscription_id, update_tag, common_job_parameters)
+>>>>>>> 8e77e107ef94c03fc325a27584aa290d2d6b9daf
 
 
 def _sync_tenant(
@@ -42,18 +69,23 @@ def _sync_tenant(
 def _sync_multiple_subscriptions(
     neo4j_session: neo4j.Session, credentials: Credentials, tenant_id: str, subscriptions: List[Dict],
     update_tag: int, common_job_parameters: Dict,
+    requested_syncs: List[str],
 ) -> None:
     logger.info("Syncing Azure subscriptions")
 
+    common_job_parameters['AZURE_TENANT_ID'] = tenant_id
     subscription.sync(neo4j_session, tenant_id, subscriptions, update_tag, common_job_parameters)
 
     for sub in subscriptions:
         logger.info("Syncing Azure Subscription with ID '%s'", sub['subscriptionId'])
         common_job_parameters['AZURE_SUBSCRIPTION_ID'] = sub['subscriptionId']
 
-        _sync_one_subscription(neo4j_session, credentials, sub['subscriptionId'], update_tag, common_job_parameters)
+        _sync_one_subscription(
+            neo4j_session, credentials, sub['subscriptionId'], update_tag, requested_syncs, common_job_parameters,
+        )
 
     del common_job_parameters["AZURE_SUBSCRIPTION_ID"]
+    del common_job_parameters["AZURE_TENANT_ID"]
 
 
 @timeit
@@ -81,6 +113,10 @@ def start_azure_ingestion(neo4j_session: neo4j.Session, config: Config) -> None:
         )
         return
 
+    requested_syncs: List[str] = list(RESOURCE_FUNCTIONS.keys())
+    if config.azure_requested_syncs:
+        requested_syncs = parse_and_validate_azure_requested_syncs(config.azure_requested_syncs)
+
     _sync_tenant(
         neo4j_session, credentials.get_tenant_id(), credentials.get_current_user(), config.update_tag,
         common_job_parameters,
@@ -100,5 +136,5 @@ def start_azure_ingestion(neo4j_session: neo4j.Session, config: Config) -> None:
 
     _sync_multiple_subscriptions(
         neo4j_session, credentials, credentials.get_tenant_id(), subscriptions, config.update_tag,
-        common_job_parameters,
+        common_job_parameters, requested_syncs,
     )
