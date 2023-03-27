@@ -57,9 +57,6 @@ setup(
         "azure-mgmt-storage>=16.0.0",
         "azure-mgmt-sql<=1.0.0",
         "azure-identity>=1.5.0",
-<<<<<<< HEAD
-        "kubernetes>=22.6.0",
-=======
         "azure-mgmt-containerinstance>=1.5.0",
         "azure-mgmt-containerregistry>=2.8.0",
         "azure-mgmt-containerservice>=4.4.0",
@@ -70,7 +67,6 @@ setup(
         "azure-mgmt-network>=2.7.0",
         "azure-mgmt-web>=0.35.0",
         "kubernetes>=18.20.0,<=21.7.0",
->>>>>>> 8e77e107ef94c03fc325a27584aa290d2d6b9daf
         "pdpyras>=4.3.0",
         "crowdstrike-falconpy>=0.5.1",
         "python-dateutil",
