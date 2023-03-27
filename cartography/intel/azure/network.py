@@ -83,23 +83,23 @@ def get_networks_list(client: NetworkManagementClient) -> List[Dict]:
 
 def _load_networks_tx(tx: neo4j.Transaction, subscription_id: str, networks_list: List[Dict], update_tag: int) -> None:
     ingest_net = """
-    UNWIND {networks} AS network
+    UNWIND $networks AS network
     MERGE (n:AzureNetwork{id: network.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = network.type,
     n.location = network.location,
     n.resourcegroup = network.resource_group
-    SET n.lastupdated = {update_tag},
+    SET n.lastupdated = $update_tag,
     n.name = network.name,
     n.resource_guid = network.resource_guid,
     n.provisioning_state=network.provisioning_state,
     n.enable_ddos_protection=network.enable_ddos_protection,
     n.etag=network.etag
     WITH n
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -161,12 +161,12 @@ def _load_networks_subnets_tx(
     update_tag: int,
 ) -> None:
     ingest_network_subnet = """
-    UNWIND {networks_subnets_list} as subnet
+    UNWIND $networks_subnets_list as subnet
     MERGE (n:AzureNetworkSubnet{id: subnet.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = subnet.type
     SET n.name = subnet.name,
-    n.lastupdated = {azure_update_tag},
+    n.lastupdated = $azure_update_tag,
     n.resource_group_name=subnet.resource_group,
     n.private_endpoint_network_policies=subnet.private_endpoint_network_policies,
     n.private_link_service_network_policies=subnet.private_link_service_network_policies,
@@ -175,7 +175,7 @@ def _load_networks_subnets_tx(
     MATCH (s:AzureNetwork{id: subnet.network_id})
     MERGE (s)-[r:CONTAIN]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {azure_update_tag}
+    SET r.lastupdated = $azure_update_tag
     """
 
     tx.run(
@@ -216,20 +216,20 @@ def _load_network_routetables_tx(
     tx: neo4j.Transaction, subscription_id: str, network_routetables_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_routetables = """
-    UNWIND {network_routetables_list} AS routetable
+    UNWIND $network_routetables_list AS routetable
     MERGE (n:AzureRouteTable{id: routetable.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = routetable.type,
     n.location = routetable.location,
     n.resourcegroup = routetable.resource_group
-    SET n.lastupdated = {update_tag},
+    SET n.lastupdated = $update_tag,
     n.name = routetable.name,
     n.etag=routetable.etag
     WITH n
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -285,18 +285,18 @@ def _load_network_routes_tx(
     update_tag: int,
 ) -> None:
     ingest_network_route = """
-    UNWIND {network_routes_list} as route
+    UNWIND $network_routes_list as route
     MERGE (n:AzureNetworkRoute{id: route.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = route.type
     SET n.name = route.name,
-    n.lastupdated = {azure_update_tag},
+    n.lastupdated = $azure_update_tag,
     n.etag=route.etag
     WITH n, route
     MATCH (s:AzureRouteTable{id: route.routetable_id})
     MERGE (s)-[r:CONTAIN]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {azure_update_tag}
+    SET r.lastupdated = $azure_update_tag
     """
 
     tx.run(
@@ -338,20 +338,20 @@ def _load_network_security_groups_tx(
     tx: neo4j.Transaction, subscription_id: str, network_security_groups_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_network = """
-    UNWIND {network_security_groups_list} AS network
+    UNWIND $network_security_groups_list AS network
     MERGE (n:AzureNetworkSecurityGroup{id: network.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = network.type,
     n.location = network.location,
     n.resourcegroup = network.resource_group
-    SET n.lastupdated = {update_tag},
+    SET n.lastupdated = $update_tag,
     n.name = network.name,
     n.etag=network.etag
     WITH n
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -409,18 +409,18 @@ def _load_network_security_rules_tx(
     update_tag: int,
 ) -> None:
     ingest_network_rule = """
-    UNWIND {network_security_rules_list} as rule
+    UNWIND $network_security_rules_list as rule
     MERGE (n:AzureNetworkSecurityRule{id: rule.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = rule.type
     SET n.name = rule.name,
-    n.lastupdated = {azure_update_tag},
+    n.lastupdated = $azure_update_tag,
     n.etag=rule.etag
     WITH n, rule
     MATCH (s:AzureNetworkSecurityGroup{id: rule.security_group_id})
     MERGE (s)-[r:CONTAIN]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {azure_update_tag}
+    SET r.lastupdated = $azure_update_tag
     """
 
     tx.run(
@@ -458,19 +458,19 @@ def _load_public_ip_addresses_tx(
     tx: neo4j.Transaction, subscription_id: str, public_ip_addresses_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_address = """
-    UNWIND {public_ip_addresses_list} AS address
+    UNWIND $public_ip_addresses_list AS address
     MERGE (n:AzurePublicIPAddress{id: address.id})
     ON CREATE SET n.firstseen = timestamp(),
     n.type = address.type,
     n.location = address.location
-    SET n.lastupdated = {update_tag},
+    SET n.lastupdated = $update_tag,
     n.name = address.name,
     n.etag=address.etag
     WITH n
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -521,18 +521,18 @@ def _load_usages_tx(
     update_tag: int,
 ) -> None:
     ingest_usages = """
-    UNWIND {usages_list} as usage
+    UNWIND $usages_list as usage
     MERGE (n:AzureNetworkUsage{id: usage.id})
     ON CREATE SET n.firstseen = timestamp()
     SET n.currentValue = usage.currentValue,
-    n.lastupdated = {azure_update_tag},
+    n.lastupdated = $azure_update_tag,
     n.limit=usage.limit,
     n.unit=usage.unit
     WITH n, usage
     MATCH (s:AzureNetwork{id: usage.network_id})
     MERGE (s)-[r:CONTAIN]->(n)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {azure_update_tag}
+    SET r.lastupdated = $azure_update_tag
     """
 
     tx.run(

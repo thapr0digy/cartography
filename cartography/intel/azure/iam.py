@@ -73,7 +73,7 @@ def _load_tenant_users_tx(
     tx: neo4j.Transaction, tenant_id: str, tenant_users_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_user = """
-    UNWIND {tenant_users_list} AS user
+    UNWIND $tenant_users_list AS user
     MERGE (i:AzureUser{id: user.id})
     ON CREATE SET i:AzurePrincipal,
     i.firstseen = timestamp(),
@@ -83,15 +83,15 @@ def _load_tenant_users_tx(
     i.surname = user.surname,
     i.user_type = user.user_type,
     i.mobile = user.mobile
-    SET i.lastupdated = {update_tag},
+    SET i.lastupdated = $update_tag,
     i.account_enabled = user.account_enabled,
     i.refreshTokensValidFromDateTime = user.refreshTokensValidFromDateTime,
     i.user_principal_name = user.user_principal_name
     WITH i
-    MATCH (owner:AzureTenant{id: {tenant_id}})
+    MATCH (owner:AzureTenant{id: $tenant_id})
     MERGE (owner)-[r:RESOURCE]->(i)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -135,7 +135,7 @@ def _load_tenant_groups_tx(
     tx: neo4j.Transaction, tenant_id: str, tenant_groups_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_group = """
-    UNWIND {tenant_groups_list} AS group
+    UNWIND $tenant_groups_list AS group
     MERGE (i:AzureGroup{id: group.id})
     ON CREATE SET i:AzurePrincipal,
     i.firstseen = timestamp(),
@@ -144,13 +144,13 @@ def _load_tenant_groups_tx(
     i.classification = group.classification,
     i.createdDateTime = group.createdDateTime,
     i.securityEnabled = group.security_enabled
-    SET i.lastupdated = {update_tag},
+    SET i.lastupdated = $update_tag,
     i.mail = group.mail
     WITH i
-    MATCH (owner:AzureTenant{id: {tenant_id}})
+    MATCH (owner:AzureTenant{id: $tenant_id})
     MERGE (owner)-[r:RESOURCE]->(i)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -194,20 +194,20 @@ def _load_tenant_applications_tx(
     tx: neo4j.Transaction, tenant_id: str, tenant_applications_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_app = """
-    UNWIND {tenant_applications_list} AS app
+    UNWIND $tenant_applications_list AS app
     MERGE (i:AzureApplication{id: app.id})
     ON CREATE SET i:AzurePrincipal,
     i.firstseen = timestamp(),
     i.object_id=app.object_id,
     i.displayName = app.display_name,
     i.publisherDomain = app.publisher_domain
-    SET i.lastupdated = {update_tag},
+    SET i.lastupdated = $update_tag,
     i.signInAudience = app.sign_in_audience
     WITH i
-    MATCH (owner:AzureTenant{id: {tenant_id}})
+    MATCH (owner:AzureTenant{id: $tenant_id})
     MERGE (owner)-[r:RESOURCE]->(i)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -253,7 +253,7 @@ def _load_tenant_service_accounts_tx(
     tx: neo4j.Transaction, tenant_id: str, tenant_service_accounts_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_app = """
-    UNWIND {tenant_service_accounts_list} AS service
+    UNWIND $tenant_service_accounts_list AS service
     MERGE (i:AzureServiceAccount{id: service.id})
     ON CREATE SET i:AzurePrincipal,
     i.firstseen = timestamp(),
@@ -261,13 +261,13 @@ def _load_tenant_service_accounts_tx(
     i.object_id=service.object_id,
     i.accountEnabled = service.account_enabled,
     i.servicePrincipalType = service.service_principal_type
-    SET i.lastupdated = {update_tag},
+    SET i.lastupdated = $update_tag,
     i.signInAudience = service.signInAudience
     WITH i
-    MATCH (owner:AzureTenant{id: {tenant_id}})
+    MATCH (owner:AzureTenant{id: $tenant_id})
     MERGE (owner)-[r:RESOURCE]->(i)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -311,21 +311,21 @@ def _load_tenant_domains_tx(
     tx: neo4j.Transaction, tenant_id: str, tenant_domains_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_domain = """
-    UNWIND {tenant_domains_list} AS domain
+    UNWIND $tenant_domains_list AS domain
     MERGE (i:AzureDomain{id: domain.id})
     ON CREATE SET i:AzurePrincipal,
     i.firstseen = timestamp(),
     i.isRoot = domain.isRoot,
     i.name = domain.name,
     i.isInitial = domain.isInitial
-    SET i.lastupdated = {update_tag},
+    SET i.lastupdated = $update_tag,
     i.authenticationType = domain.authentication_type,
     i.availabilityStatus = domain.availabilityStatus
     WITH i
-    MATCH (owner:AzureTenant{id: {tenant_id}})
+    MATCH (owner:AzureTenant{id: $tenant_id})
     MERGE (owner)-[r:RESOURCE]->(i)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -379,25 +379,25 @@ def _load_roles_tx(
     tx: neo4j.Transaction, tenant_id: str, roles_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_role = """
-    UNWIND {roles_list} AS role
+    UNWIND $roles_list AS role
     MERGE (i:AzureRole{id: role.id})
     ON CREATE SET i:AzurePrincipal,
     i.firstseen = timestamp(),
     i.name = role.name,
     i.type = role.type
-    SET i.lastupdated = {update_tag},
+    SET i.lastupdated = $update_tag,
     i.roleName = role.roleName,
     i.permissions = role.permissions
     WITH i,role
     MATCH (principal:AzurePrincipal) where principal.object_id = role.principal_id
     MERGE (principal)-[r:ASSUME_ROLE]->(i)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     WITH i
-    MATCH (t:AzureTenant{id: {tenant_id}})
+    MATCH (t:AzureTenant{id: $tenant_id})
     MERGE (t)-[tr:RESOURCE]->(i)
     ON CREATE SET tr.firstseen = timestamp()
-    SET tr.lastupdated = {update_tag}
+    SET tr.lastupdated = $update_tag
     """
 
     tx.run(

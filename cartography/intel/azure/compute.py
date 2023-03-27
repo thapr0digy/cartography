@@ -109,16 +109,16 @@ def get_vm_extensions_list(vm_list: List[Dict], client: ComputeManagementClient)
 
 def _load_vm_extensions_tx(tx: neo4j.Transaction, vm_extensions_list: List[Dict], update_tag: int) -> None:
     ingest_vm_extension = """
-    UNWIND {vm_extensions_list} AS extension
+    UNWIND $vm_extensions_list AS extension
     MERGE (v:AzureVirtualMachineExtension{id: extension.id})
     ON CREATE SET v.firstseen = timestamp(), v.location = extension.location
-    SET v.lastupdated = {update_tag}, v.name = extension.name,
+    SET v.lastupdated = $update_tag, v.name = extension.name,
     v.type = extension.type
     WITH v,extension
     MATCH (owner:AzureVirtualMachine{id: extension.vm_id})
     MERGE (owner)-[r:CONTAIN]->(v)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -167,10 +167,10 @@ def get_vm_available_sizes_list(vm_list: List[Dict], client: ComputeManagementCl
 
 def _load_vm_available_sizes_tx(tx: neo4j.Transaction, vm_available_sizes_list: List[Dict], update_tag: int) -> None:
     ingest_vm_size = """
-    UNWIND {vm_available_sizes_list} AS size
+    UNWIND $vm_available_sizes_list AS size
     MERGE (v:AzureVirtualMachineAvailableSize{name: size.name})
     ON CREATE SET v.firstseen = timestamp(), v.numberOfCores = size.numberOfCores
-    SET v.lastupdated = {update_tag}, v.osDiskSizeInMB = size.osDiskSizeInMB,
+    SET v.lastupdated = $update_tag, v.osDiskSizeInMB = size.osDiskSizeInMB,
     v.resourceDiskSizeInMB = size.resourceDiskSizeInMB,
     v.memoryInMB=size.memoryInMB,
     v.maxDataDiskCount=size.maxDataDiskCount
@@ -178,7 +178,7 @@ def _load_vm_available_sizes_tx(tx: neo4j.Transaction, vm_available_sizes_list: 
     MATCH (owner:AzureVirtualMachine{id: size.vm_id})
     MERGE (owner)-[r:CONTAIN]->(v)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -224,19 +224,19 @@ def _load_vm_scale_sets_tx(
     tx: neo4j.Transaction, subscription_id: str, vm_scale_sets_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_scale_set = """
-    UNWIND {vm_scale_sets_list} AS set
+    UNWIND $vm_scale_sets_list AS set
     MERGE (a:AzureVirtualMachineScaleSet{id: set.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = set.type,
     a.location = set.location,
     a.resourcegroup = set.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = set.name
     WITH a
     MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
     MERGE (owner)-[r:RESOURCE]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -293,16 +293,16 @@ def _load_vm_scale_sets_extensions_tx(
     tx: neo4j.Transaction, vm_scale_sets_extensions_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_vm_scale_sets_extension = """
-    UNWIND {vm_scale_sets_extensions_list} AS extension
+    UNWIND $vm_scale_sets_extensions_list AS extension
     MERGE (v:AzureVirtualMachineScaleSetExtension{id: extension.id})
     ON CREATE SET v.firstseen = timestamp()
-    SET v.lastupdated = {update_tag}, v.name = extension.name,
+    SET v.lastupdated = $update_tag, v.name = extension.name,
     v.type = extension.type
     WITH v,extension
     MATCH (owner:AzureVirtualMachineScaleSet{id: extension.set_id})
     MERGE (owner)-[r:CONTAIN]->(v)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(

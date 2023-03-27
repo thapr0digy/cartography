@@ -42,19 +42,19 @@ def _load_key_vaults_tx(
     tx: neo4j.Transaction, subscription_id: str, key_vaults_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_vault = """
-    UNWIND {key_vaults_list} AS vault
+    UNWIND $key_vaults_list AS vault
     MERGE (k:AzureKeyVault{id: vault.id})
     ON CREATE SET k.firstseen = timestamp(),
     k.type = vault.type,
     k.location = vault.location,
     k.resourcegroup = vault.resource_group
-    SET k.lastupdated = {update_tag},
+    SET k.lastupdated = $update_tag,
     k.name = vault.name
     WITH k
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(k)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(

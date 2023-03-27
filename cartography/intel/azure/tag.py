@@ -43,19 +43,19 @@ def _load_resource_groups_tx(
     tx: neo4j.Transaction, subscription_id: str, resource_groups_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_group = """
-    UNWIND {resource_groups_list} AS group
+    UNWIND $resource_groups_list AS group
     MERGE (t:AzureResourceGroup{id: group.id})
     ON CREATE SET t.firstseen = timestamp(),
     t.type = group.type,
     t.location = group.location,
     t.managedBy = group.managedBy
-    SET t.lastupdated = {update_tag},
+    SET t.lastupdated = $update_tag,
     t.name = group.name
     WITH t
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(t)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -106,19 +106,19 @@ def get_tags_list(
 
 def _load_tags_tx(tx: neo4j.Transaction, tags_list: List[Dict], update_tag: int) -> None:
     ingest_tag = """
-    UNWIND {tags_list} AS tag
+    UNWIND $tags_list AS tag
     MERGE (t:AzureTag{id: tag.id})
     ON CREATE SET t.firstseen = timestamp(),
     t.type = tag.type,
     t.resource_group = tag.resource_group
-    SET t.lastupdated = {update_tag},
+    SET t.lastupdated = $update_tag,
     t.value = tag.value,
     t.name = tag.name
     WITH t,tag
     MATCH (l) where l.id = tag.resource_id
     MERGE (l)-[r:TAGGED]->(t)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(

@@ -13,7 +13,7 @@ from . import storage
 
 
 RESOURCE_FUNCTIONS: Dict = {
-    'iam': iam.sync,
+    #'iam': iam.sync,
     'aks': aks.sync,
     'cosmosdb': cosmosdb.sync,
     'function_app': function_app.sync,

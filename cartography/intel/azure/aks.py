@@ -86,19 +86,19 @@ def get_aks_list(credentials: Credentials, subscription_id: str) -> List[Dict]:
 
 def _load_aks_tx(tx: neo4j.Transaction, subscription_id: str, aks_list: List[Dict], update_tag: int) -> None:
     ingest_aks = """
-    UNWIND {aks_list} AS aks
+    UNWIND $aks_list AS aks
     MERGE (a:AzureCluster{id: aks.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = aks.type,
     a.location = aks.location,
     a.resourcegroup = aks.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = aks.name
     WITH a
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -142,19 +142,19 @@ def _load_container_registries_tx(
     tx: neo4j.Transaction, subscription_id: str, container_registries_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_container_registry = """
-    UNWIND {container_registries_list} AS registry
+    UNWIND $container_registries_list AS registry
     MERGE (a:AzureContainerRegistry{id: registry.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = registry.type,
     a.location = registry.location,
     a.resourcegroup = registry.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = registry.name
     WITH a
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -224,19 +224,19 @@ def _load_container_registry_replications_tx(
     tx: neo4j.Transaction, container_registry_replications_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_container_replication = """
-    UNWIND {container_registry_replications_list} AS replication
+    UNWIND $container_registry_replications_list AS replication
     MERGE (a:AzureContainerRegistryReplication{id: replication.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = replication.type,
     a.location = replication.location,
     a.resourcegroup = replication.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = replication.name
     WITH a,replication
     MATCH (owner:AzureContainerRegistry{id: replication.container_registry_id})
     MERGE (owner)-[r:CONTAIN]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -294,18 +294,18 @@ def _load_container_registry_runs_tx(
     tx: neo4j.Transaction, container_registry_runs_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_container_run = """
-    UNWIND {container_registry_runs_list} AS run
+    UNWIND $container_registry_runs_list AS run
     MERGE (a:AzureContainerRegistryRun{id: run.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = run.type,
     a.resourcegroup = run.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = run.name
     WITH a,run
     MATCH (owner:AzureContainerRegistry{id: run.container_registry_id})
     MERGE (owner)-[r:CONTAIN]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -362,19 +362,19 @@ def _load_container_registry_tasks_tx(
     tx: neo4j.Transaction, container_registry_tasks_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_container_task = """
-    UNWIND {container_registry_tasks_list} AS task
+    UNWIND $container_registry_tasks_list AS task
     MERGE (a:AzureContainerRegistryTask{id: task.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = task.type,
     a.location=task.location,
     a.resourcegroup = task.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = task.name
     WITH a,task
     MATCH (owner:AzureContainerRegistry{id: task.container_registry_id})
     MERGE (owner)-[r:CONTAIN]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -431,19 +431,19 @@ def _load_container_registry_webhooks_tx(
     tx: neo4j.Transaction, container_registry_webhooks_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_container_webhook = """
-    UNWIND {container_registry_webhooks_list} AS webhook
+    UNWIND $container_registry_webhooks_list AS webhook
     MERGE (a:AzureContainerRegistryWebhook{id: webhook.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = webhook.type,
     a.location=webhook.location,
     a.resourcegroup = webhook.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = webhook.name
     WITH a,webhook
     MATCH (owner:AzureContainerRegistry{id: webhook.container_registry_id})
     MERGE (owner)-[r:CONTAIN]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -487,19 +487,19 @@ def _load_container_groups_tx(
     tx: neo4j.Transaction, subscription_id: str, container_groups_list: List[Dict], update_tag: int,
 ) -> None:
     ingest_container_group = """
-    UNWIND {container_groups_list} AS group
+    UNWIND $container_groups_list AS group
     MERGE (a:AzureContainerGroup{id: group.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = group.type,
     a.location = group.location,
     a.resourcegroup = group.resource_group
-    SET a.lastupdated = {update_tag},
+    SET a.lastupdated = $update_tag,
     a.name = group.name
     WITH a
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
@@ -547,18 +547,18 @@ def get_containers_list(container_groups_list: List[Dict]) -> List[Dict]:
 
 def _load_containers_tx(tx: neo4j.Transaction, containers_list: List[Dict], update_tag: int) -> None:
     ingest_container = """
-    UNWIND {containers_list} AS container
+    UNWIND $containers_list AS container
     MERGE (a:AzureContainer{id: container.id})
     ON CREATE SET a.firstseen = timestamp(),
     a.type = container.type,
     a.name = container.name,
     a.resourcegroup = container.resource_group
-    SET a.lastupdated = {update_tag}
+    SET a.lastupdated = $update_tag
     WITH a,container
     MATCH (owner:AzureContainerGroup{id: container.container_group_id})
     MERGE (owner)-[r:CONTAIN]->(a)
     ON CREATE SET r.firstseen = timestamp()
-    SET r.lastupdated = {update_tag}
+    SET r.lastupdated = $update_tag
     """
 
     tx.run(
