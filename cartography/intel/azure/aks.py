@@ -75,7 +75,14 @@ def get_aks_list(credentials: Credentials, subscription_id: str) -> List[Dict]:
 
         for aks in aks_list:
             x = aks['id'].split('/')
-            aks['resource_group'] = x[x.index('resourcegroups') + 1]
+            if "resourceGroups" not in x:
+                if "resourcegroups" in x:
+                    aks['resource_group'] = x[x.index('resourcegroups') + 1]
+                    continue
+                else:
+                    aks['resource_group'] = ""
+                    continue
+            aks['resource_group'] = x[x.index('resourceGroups') + 1]
 
         return aks_list
 
@@ -129,7 +136,12 @@ def get_container_registries_list(client: ContainerRegistryManagementClient) -> 
 
         for registry in container_registries_list:
             x = registry['id'].split('/')
-            registry['resource_group'] = x[x.index('resourcegroups') + 1]
+            if "resourceGroups" not in x:
+                if "resourcegroups" in x:
+                    registry['resource_group'] = x[x.index('resourcegroups') + 1]
+                else:
+                    registry['resource_group'] = ""
+            registry['resource_group'] = x[x.index('resourceGroups') + 1]
 
         return container_registries_list
 
@@ -280,7 +292,12 @@ def get_container_registry_runs_list(
 
         for run in container_registry_runs_list:
             x = run['id'].split('/')
-            run['resource_group'] = x[x.index('resourcegroups') + 1]
+            if "resourceGroups" not in x:
+                if "resourcegroups" in x:
+                    run['resource_group'] = x[x.index('resourcegroups') + 1]
+                else:
+                    run['resource_group'] = ""
+            run['resource_group'] = x[x.index('resourceGroups') + 1]
             run['container_registry_id'] = run['id'][:run['id'].index("/runs")]
 
         return container_registry_runs_list

@@ -86,7 +86,7 @@ def get_tags_list(
                         'resource_group': resource_group['name'],
                     }]
             for resource in client.resources.list_by_resource_group(resource_group_name=resource_group['name']):
-                if neo4j_session.run("MATCH (n) WHERE n.id={id} return count(*)", id=resource.id).single().value() == 1:
+                if neo4j_session.run("MATCH (n) WHERE n.id=$id return count(*)", id=resource.id).single().value() == 1:
                     if resource.tags:
                         for tagname in resource.tags:
                             tags_list = tags_list + \

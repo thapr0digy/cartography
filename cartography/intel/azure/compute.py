@@ -86,14 +86,19 @@ def get_vm_extensions_list(vm_list: List[Dict], client: ComputeManagementClient)
     try:
         vm_extensions_list: List[Dict] = []
         for vm in vm_list:
+            # FIXME: This currently is not working 
             vm_extensions_list = vm_extensions_list + \
-                list(
-                    map(
-                        lambda x: x.as_dict(), client.virtual_machine_extensions.list(
-                            resource_group_name=vm['resource_group'], vm_name=vm['name'],
-                        ),
-                    ),
+            list(client.virtual_machine_extensions.list(
+                resource_group_name=vm['resource_group'], vm_name=vm['name'])
                 )
+            #
+            #    list(
+            #        map(
+            #            lambda x: x.as_dict(), client.virtual_machine_extensions.list(
+            #                resource_group_name=vm['resource_group'], vm_name=vm['name']
+            #            ),
+            #        ),
+            #    )
 
         for extension in vm_extensions_list:
             x = extension['id'].split('/')
@@ -105,6 +110,12 @@ def get_vm_extensions_list(vm_list: List[Dict], client: ComputeManagementClient)
     except HttpResponseError as e:
         logger.warning(f"Error while retrieving virtual machine extensions- {e}")
         return []
+    except TypeError as te:
+        logger.warning(f"ResourceGroup: {vm['resource_group']}")
+        logger.warning(f"VM Name: {vm['name']}")
+        x = client.virtual_machine_extensions.list(
+                resource_group_name=vm['resource_group'], vm_name=vm['name'])
+        logger.warning(f"{x}")
 
 
 def _load_vm_extensions_tx(tx: neo4j.Transaction, vm_extensions_list: List[Dict], update_tag: int) -> None:
@@ -233,7 +244,7 @@ def _load_vm_scale_sets_tx(
     SET a.lastupdated = $update_tag,
     a.name = set.name
     WITH a
-    MATCH (owner:AzureSubscription{id: {SUBSCRIPTION_ID}})
+    MATCH (owner:AzureSubscription{id: $SUBSCRIPTION_ID})
     MERGE (owner)-[r:RESOURCE]->(a)
     ON CREATE SET r.firstseen = timestamp()
     SET r.lastupdated = $update_tag
@@ -489,6 +500,6 @@ def sync(
     logger.info("Syncing VM for subscription '%s'.", subscription_id)
 
     sync_virtual_machine(neo4j_session, credentials, subscription_id, update_tag, common_job_parameters)
-    sync_vm_scale_sets(neo4j_session, credentials, subscription_id, update_tag, common_job_parameters)
+    #sync_vm_scale_sets(neo4j_session, credentials, subscription_id, update_tag, common_job_parameters)
     sync_disk(neo4j_session, credentials, subscription_id, update_tag, common_job_parameters)
     sync_snapshot(neo4j_session, credentials, subscription_id, update_tag, common_job_parameters)

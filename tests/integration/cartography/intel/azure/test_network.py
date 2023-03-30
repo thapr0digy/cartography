@@ -40,7 +40,7 @@ def test_load_networks(neo4j_session):
 def test_load_network_relationships(neo4j_session):
     neo4j_session.run(
         """
-        MERGE (as:AzureSubscription{id: {subscription_id}})
+        MERGE (as:AzureSubscription{id: $subscription_id})
         ON CREATE SET as.firstseen = timestamp()
         SET as.lastupdated = {update_tag}
         """,
@@ -167,7 +167,7 @@ def test_load_routetables(neo4j_session):
 def test_load_routetable_relationships(neo4j_session):
     neo4j_session.run(
         """
-        MERGE (as:AzureSubscription{id: {subscription_id}})
+        MERGE (as:AzureSubscription{id: $subscription_id})
         ON CREATE SET as.firstseen = timestamp()
         SET as.lastupdated = {update_tag}
         """,
@@ -294,7 +294,7 @@ def test_load_network_security_groups(neo4j_session):
 def test_load_network_security_group_relationships(neo4j_session):
     neo4j_session.run(
         """
-        MERGE (as:AzureSubscription{id: {subscription_id}})
+        MERGE (as:AzureSubscription{id: $subscription_id})
         ON CREATE SET as.firstseen = timestamp()
         SET as.lastupdated = {update_tag}
         """,
@@ -421,7 +421,7 @@ def test_load_public_ip_addresses(neo4j_session):
 def test_load_public_ip_address_relationships(neo4j_session):
     neo4j_session.run(
         """
-        MERGE (as:AzureSubscription{id: {subscription_id}})
+        MERGE (as:AzureSubscription{id: $subscription_id})
         ON CREATE SET as.firstseen = timestamp()
         SET as.lastupdated = {update_tag}
         """,
