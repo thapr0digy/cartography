@@ -38,7 +38,7 @@ def test_load_function_apps(neo4j_session):
 def test_load_function_app_relationships(neo4j_session):
     neo4j_session.run(
         """
-        MERGE (as:AzureSubscription{id: {subscription_id}})
+        MERGE (as:AzureSubscription{id: $subscription_id})
         ON CREATE SET as.firstseen = timestamp()
         SET as.lastupdated = {update_tag}
         """,
