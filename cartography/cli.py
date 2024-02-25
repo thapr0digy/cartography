@@ -586,6 +586,7 @@ def main(argv=None):
     logging.getLogger('botocore').setLevel(logging.WARNING)
     logging.getLogger('googleapiclient').setLevel(logging.WARNING)
     logging.getLogger('neo4j').setLevel(logging.WARNING)
+    logging.getLogger('azure.mgmt.security._serialization').setLevel(logging.CRITICAL)
     argv = argv if argv is not None else sys.argv[1:]
     default_sync = cartography.sync.build_default_sync()
     sys.exit(CLI(default_sync, prog='cartography').main(argv))

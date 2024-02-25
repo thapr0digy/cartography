@@ -8,7 +8,7 @@ from azure.mgmt.web import WebSiteManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ def load_function_apps_webjobs(
     )
 
 
-@timeit
+@timing
 def get_client(
     credentials: Credentials,
     subscription_id: str,
@@ -104,7 +104,7 @@ def get_client(
     return client
 
 
-@timeit
+@timing
 def get_function_apps_list(client: WebSiteManagementClient) -> List[Dict]:
     try:
         function_app_list = list(
@@ -829,7 +829,7 @@ def sync_function_apps_webjobs(
     cleanup_function_apps_webjobs(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def sync(
     neo4j_session: neo4j.Session,
     credentials: Credentials,

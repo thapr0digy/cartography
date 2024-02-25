@@ -9,7 +9,7 @@ from azure.mgmt.resource import SubscriptionClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ def cleanup(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_subscriptions_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def sync(
     neo4j_session: neo4j.Session, tenant_id: str, subscriptions: List[Dict], update_tag: int,
     common_job_parameters: Dict,

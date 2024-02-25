@@ -14,12 +14,12 @@ from azure.mgmt.cosmosdb import CosmosDBManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
 
-@timeit
+@timing
 def get_client(credentials: Credentials, subscription_id: str) -> CosmosDBManagementClient:
     """
     Getting the CosmosDB client
@@ -28,7 +28,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> CosmosDBManage
     return client
 
 
-@timeit
+@timing
 def get_database_account_list(credentials: Credentials, subscription_id: str) -> List[Dict]:
     """
     Get a list of all database accounts.
@@ -55,7 +55,7 @@ def get_database_account_list(credentials: Credentials, subscription_id: str) ->
     return database_account_list
 
 
-@timeit
+@timing
 def transform_database_account_data(database_account_list: List[Dict]) -> List[Dict]:
     """
     Transforming the database account response for neo4j ingestion.
@@ -73,7 +73,7 @@ def transform_database_account_data(database_account_list: List[Dict]) -> List[D
     return database_account_list
 
 
-@timeit
+@timing
 def load_database_account_data(
         neo4j_session: neo4j.Session, subscription_id: str, database_account_list: List[Dict], azure_update_tag: int,
 ) -> None:
@@ -122,7 +122,7 @@ def load_database_account_data(
     )
 
 
-@timeit
+@timing
 def sync_database_account_data_resources(
         neo4j_session: neo4j.Session, subscription_id: str, database_account_list: List[Dict], azure_update_tag: int,
 ) -> None:
@@ -140,7 +140,7 @@ def sync_database_account_data_resources(
         _load_database_account_associated_locations(neo4j_session, database_account, azure_update_tag)
 
 
-@timeit
+@timing
 def _load_database_account_write_locations(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -176,7 +176,7 @@ def _load_database_account_write_locations(
         )
 
 
-@timeit
+@timing
 def _load_database_account_read_locations(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -212,7 +212,7 @@ def _load_database_account_read_locations(
         )
 
 
-@timeit
+@timing
 def _load_database_account_associated_locations(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -248,7 +248,7 @@ def _load_database_account_associated_locations(
         )
 
 
-@timeit
+@timing
 def transform_cosmosdb_cors_policy(database_account: Dict) -> Dict:
     """
     Transform CosmosDB Cors Policy response for neo4j ingestion.
@@ -260,7 +260,7 @@ def transform_cosmosdb_cors_policy(database_account: Dict) -> Dict:
     return database_account
 
 
-@timeit
+@timing
 def _load_cosmosdb_cors_policy(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -297,7 +297,7 @@ def _load_cosmosdb_cors_policy(
         )
 
 
-@timeit
+@timing
 def _load_cosmosdb_failover_policies(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -330,7 +330,7 @@ def _load_cosmosdb_failover_policies(
         )
 
 
-@timeit
+@timing
 def _load_cosmosdb_private_endpoint_connections(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -367,7 +367,7 @@ def _load_cosmosdb_private_endpoint_connections(
         )
 
 
-@timeit
+@timing
 def _load_cosmosdb_virtual_network_rules(
         neo4j_session: neo4j.Session, database_account: Dict, azure_update_tag: int,
 ) -> None:
@@ -399,7 +399,7 @@ def _load_cosmosdb_virtual_network_rules(
         )
 
 
-@timeit
+@timing
 def sync_database_account_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         database_account_list: List[Dict], sync_tag: int, common_job_parameters: Dict,
@@ -408,7 +408,7 @@ def sync_database_account_details(
     load_database_account_details(neo4j_session, credentials, subscription_id, details, sync_tag, common_job_parameters)
 
 
-@timeit
+@timing
 def get_database_account_details(
         credentials: Credentials, subscription_id: str, database_account_list: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -426,7 +426,7 @@ def get_database_account_details(
         ], sql_databases, cassandra_keyspaces, mongodb_databases, table_resources
 
 
-@timeit
+@timing
 def get_sql_databases(credentials: Credentials, subscription_id: str, database_account: Dict) -> List[Dict]:
     """
     Return the list of SQL Databases in a database account.
@@ -456,7 +456,7 @@ def get_sql_databases(credentials: Credentials, subscription_id: str, database_a
     return sql_database_list
 
 
-@timeit
+@timing
 def get_cassandra_keyspaces(credentials: Credentials, subscription_id: str, database_account: Dict) -> List[Dict]:
     """
     Return the list of Cassandra Keyspaces in a database account.
@@ -486,7 +486,7 @@ def get_cassandra_keyspaces(credentials: Credentials, subscription_id: str, data
     return cassandra_keyspace_list
 
 
-@timeit
+@timing
 def get_mongodb_databases(credentials: Credentials, subscription_id: str, database_account: Dict) -> List[Dict]:
     """
     Return the list of MongoDB Databases in a database account.
@@ -516,7 +516,7 @@ def get_mongodb_databases(credentials: Credentials, subscription_id: str, databa
     return mongodb_database_list
 
 
-@timeit
+@timing
 def get_table_resources(credentials: Credentials, subscription_id: str, database_account: Dict) -> List[Dict]:
     """
     Return the list of Table Resources in a database account.
@@ -546,7 +546,7 @@ def get_table_resources(credentials: Credentials, subscription_id: str, database
     return table_resources_list
 
 
-@timeit
+@timing
 def transform_database_account_resources(
         account_id: Any, name: Any, resource_group: Any, resources: List[Dict],
 ) -> List[Dict]:
@@ -560,7 +560,7 @@ def transform_database_account_resources(
     return resources
 
 
-@timeit
+@timing
 def load_database_account_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         details: List[Tuple[Any, Any, Any, Any, Any, Any, Any]], update_tag: int, common_job_parameters: Dict,
@@ -614,7 +614,7 @@ def load_database_account_details(
     )
 
 
-@timeit
+@timing
 def _load_sql_databases(neo4j_session: neo4j.Session, sql_databases: List[Dict], update_tag: int) -> None:
     """
     Ingest SQL Databases into neo4j.
@@ -642,7 +642,7 @@ def _load_sql_databases(neo4j_session: neo4j.Session, sql_databases: List[Dict],
     )
 
 
-@timeit
+@timing
 def _load_cassandra_keyspaces(neo4j_session: neo4j.Session, cassandra_keyspaces: List[Dict], update_tag: int) -> None:
     """
     Ingest Cassandra keyspaces into neo4j.
@@ -670,7 +670,7 @@ def _load_cassandra_keyspaces(neo4j_session: neo4j.Session, cassandra_keyspaces:
     )
 
 
-@timeit
+@timing
 def _load_mongodb_databases(neo4j_session: neo4j.Session, mongodb_databases: List[Dict], update_tag: int) -> None:
     """
     Ingest MongoDB databases into neo4j.
@@ -698,7 +698,7 @@ def _load_mongodb_databases(neo4j_session: neo4j.Session, mongodb_databases: Lis
     )
 
 
-@timeit
+@timing
 def _load_table_resources(neo4j_session: neo4j.Session, table_resources: List[Dict], update_tag: int) -> None:
     """
     Ingest Table resources into neo4j.
@@ -726,7 +726,7 @@ def _load_table_resources(neo4j_session: neo4j.Session, table_resources: List[Di
     )
 
 
-@timeit
+@timing
 def sync_sql_database_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str, sql_databases: List[Dict],
         update_tag: int, common_job_parameters: Dict,
@@ -736,7 +736,7 @@ def sync_sql_database_details(
     cleanup_sql_database_details(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_sql_database_details(
         credentials: Credentials, subscription_id: str, sql_databases: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -748,7 +748,7 @@ def get_sql_database_details(
         yield database['id'], containers
 
 
-@timeit
+@timing
 def get_sql_containers(credentials: Credentials, subscription_id: str, database: Dict) -> List[Dict]:
     """
     Returns the list of SQL containers in a database.
@@ -779,7 +779,7 @@ def get_sql_containers(credentials: Credentials, subscription_id: str, database:
     return containers
 
 
-@timeit
+@timing
 def load_sql_database_details(neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int) -> None:
     """
     Create dictionary for SQL Containers
@@ -795,7 +795,7 @@ def load_sql_database_details(neo4j_session: neo4j.Session, details: List[Tuple[
     _load_sql_containers(neo4j_session, containers, update_tag)
 
 
-@timeit
+@timing
 def _load_sql_containers(neo4j_session: neo4j.Session, containers: List[Dict], update_tag: int) -> None:
     """
     Ingest SQL Container details into neo4j.
@@ -829,7 +829,7 @@ def _load_sql_containers(neo4j_session: neo4j.Session, containers: List[Dict], u
     )
 
 
-@timeit
+@timing
 def sync_cassandra_keyspace_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str, cassandra_keyspaces: List[Dict],
         update_tag: int, common_job_parameters: Dict,
@@ -839,7 +839,7 @@ def sync_cassandra_keyspace_details(
     cleanup_cassandra_keyspace_details(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_cassandra_keyspace_details(
         credentials: Credentials, subscription_id: str, cassandra_keyspaces: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -851,7 +851,7 @@ def get_cassandra_keyspace_details(
         yield keyspace['id'], cassandra_tables
 
 
-@timeit
+@timing
 def get_cassandra_tables(credentials: Credentials, subscription_id: str, keyspace: Dict) -> List[Dict]:
     """
     Returns the list of tables in a Cassandra Keyspace.
@@ -882,7 +882,7 @@ def get_cassandra_tables(credentials: Credentials, subscription_id: str, keyspac
     return cassandra_tables
 
 
-@timeit
+@timing
 def load_cassandra_keyspace_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int,
 ) -> None:
@@ -900,7 +900,7 @@ def load_cassandra_keyspace_details(
     _load_cassandra_tables(neo4j_session, cassandra_tables, update_tag)
 
 
-@timeit
+@timing
 def _load_cassandra_tables(neo4j_session: neo4j.Session, cassandra_tables: List[Dict], update_tag: int) -> None:
     """
     Ingest Cassandra Tables into neo4j.
@@ -931,7 +931,7 @@ def _load_cassandra_tables(neo4j_session: neo4j.Session, cassandra_tables: List[
     )
 
 
-@timeit
+@timing
 def sync_mongodb_database_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str, mongodb_databases: List[Dict],
         update_tag: int, common_job_parameters: Dict,
@@ -941,7 +941,7 @@ def sync_mongodb_database_details(
     cleanup_mongodb_database_details(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_mongodb_databases_details(
         credentials: Credentials, subscription_id: str, mongodb_databases: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -953,7 +953,7 @@ def get_mongodb_databases_details(
         yield database['id'], collections
 
 
-@timeit
+@timing
 def get_mongodb_collections(credentials: Credentials, subscription_id: str, database: Dict) -> List[Dict]:
     """
     Returns the list of collections in a MongoDB Database.
@@ -984,7 +984,7 @@ def get_mongodb_collections(credentials: Credentials, subscription_id: str, data
     return collections
 
 
-@timeit
+@timing
 def load_mongodb_databases_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int,
 ) -> None:
@@ -1002,7 +1002,7 @@ def load_mongodb_databases_details(
     _load_collections(neo4j_session, collections, update_tag)
 
 
-@timeit
+@timing
 def _load_collections(neo4j_session: neo4j.Session, collections: List[Dict], update_tag: int) -> None:
     """
     Ingest MongoDB Collections into neo4j.
@@ -1032,32 +1032,32 @@ def _load_collections(neo4j_session: neo4j.Session, collections: List[Dict], upd
     )
 
 
-@timeit
+@timing
 def cleanup_azure_database_accounts(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_database_account_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def cleanup_sql_database_details(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_cosmosdb_sql_database_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def cleanup_cassandra_keyspace_details(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_cosmosdb_cassandra_keyspace_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def cleanup_mongodb_database_details(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_cosmosdb_mongodb_database_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def cleanup_table_resources(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_cosmosdb_table_resources_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def sync(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         sync_tag: int, common_job_parameters: Dict,

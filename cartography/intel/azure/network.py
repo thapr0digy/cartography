@@ -8,7 +8,7 @@ from azure.mgmt.network import NetworkManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -229,13 +229,13 @@ def load_usages(neo4j_session: neo4j.Session, data_list: List[Dict], update_tag:
     )
 
 
-@timeit
+@timing
 def get_network_client(credentials: Credentials, subscription_id: str) -> NetworkManagementClient:
     client = NetworkManagementClient(credentials, subscription_id)
     return client
 
 
-@timeit
+@timing
 def get_networks_list(client: NetworkManagementClient) -> List[Dict]:
     try:
         networks_list = list(map(lambda x: x.as_dict(), client.virtual_networks.list_all()))

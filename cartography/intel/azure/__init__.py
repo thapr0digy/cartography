@@ -13,7 +13,7 @@ from .util.credentials import Authenticator
 from .util.credentials import Credentials
 from cartography.config import Config
 from cartography.intel.azure.util.common import parse_and_validate_azure_requested_syncs
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ def _sync_multiple_subscriptions(
     del common_job_parameters["AZURE_TENANT_ID"]
 
 
-@timeit
+@timing
 def start_azure_ingestion(neo4j_session: neo4j.Session, config: Config) -> None:
     common_job_parameters = {
         "UPDATE_TAG": config.update_tag,

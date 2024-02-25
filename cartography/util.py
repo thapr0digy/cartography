@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 from functools import wraps
+from time import time
 from string import Template
 from typing import Any
 from typing import BinaryIO
@@ -165,6 +166,18 @@ def timeit(method: F) -> F:
             return method(*args, **kwargs)
 
     return cast(F, timed)
+
+
+def timing(f):
+    @wraps(f)
+    def wrap(*args, **kw):
+        ts = time()
+        result = f(*args, **kw)
+        te = time()
+        logger.info('func:%r took: %2.4f sec' % \
+          (f.__name__, te-ts))
+        return result
+    return wrap
 
 
 def aws_paginate(

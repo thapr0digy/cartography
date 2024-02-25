@@ -8,7 +8,7 @@ from azure.mgmt.compute import ComputeManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -492,7 +492,7 @@ def sync_snapshot(
     cleanup_snapshot(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def sync(
     neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str, update_tag: int,
     common_job_parameters: Dict,

@@ -16,12 +16,12 @@ from msrestazure.azure_exceptions import CloudError
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
 
-@timeit
+@timing
 def get_client(credentials: Credentials, subscription_id: str) -> SqlManagementClient:
     """
     Getting the Azure SQL client
@@ -30,7 +30,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> SqlManagementC
     return client
 
 
-@timeit
+@timing
 def get_server_list(credentials: Credentials, subscription_id: str) -> List[Dict]:
     """
     Returning the list of Azure SQL servers.
@@ -57,7 +57,7 @@ def get_server_list(credentials: Credentials, subscription_id: str) -> List[Dict
     return server_list
 
 
-@timeit
+@timing
 def load_server_data(
         neo4j_session: neo4j.Session, subscription_id: str, server_list: List[Dict],
         azure_update_tag: int,
@@ -90,7 +90,7 @@ def load_server_data(
     )
 
 
-@timeit
+@timing
 def sync_server_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         server_list: List[Dict], sync_tag: int,
@@ -99,7 +99,7 @@ def sync_server_details(
     load_server_details(neo4j_session, credentials, subscription_id, details, sync_tag)  # type: ignore
 
 
-@timeit
+@timing
 def get_server_details(
         credentials: Credentials, subscription_id: str, server_list: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -119,7 +119,7 @@ def get_server_details(
         ], dns_alias, ad_admins, r_databases, rd_databases, fgs, elastic_pools, databases
 
 
-@timeit
+@timing
 def get_dns_aliases(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of the DNS aliases in a server.
@@ -146,7 +146,7 @@ def get_dns_aliases(credentials: Credentials, subscription_id: str, server: Dict
     return dns_aliases
 
 
-@timeit
+@timing
 def get_ad_admins(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of the Server AD Administrators in a server.
@@ -176,7 +176,7 @@ def get_ad_admins(credentials: Credentials, subscription_id: str, server: Dict) 
     return ad_admins
 
 
-@timeit
+@timing
 def get_recoverable_databases(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of the Recoverable databases in a server.
@@ -209,7 +209,7 @@ def get_recoverable_databases(credentials: Credentials, subscription_id: str, se
     return recoverable_databases
 
 
-@timeit
+@timing
 def get_restorable_dropped_databases(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of the Restorable Dropped Databases in a server.
@@ -238,7 +238,7 @@ def get_restorable_dropped_databases(credentials: Credentials, subscription_id: 
     return restorable_dropped_databases
 
 
-@timeit
+@timing
 def get_failover_groups(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of Failover groups in a server.
@@ -262,7 +262,7 @@ def get_failover_groups(credentials: Credentials, subscription_id: str, server: 
     return failover_groups
 
 
-@timeit
+@timing
 def get_elastic_pools(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of Elastic Pools in a server.
@@ -286,7 +286,7 @@ def get_elastic_pools(credentials: Credentials, subscription_id: str, server: Di
     return elastic_pools
 
 
-@timeit
+@timing
 def get_databases(credentials: Credentials, subscription_id: str, server: Dict) -> List[Dict]:
     """
     Returns details of Databases in a SQL server.
@@ -310,7 +310,7 @@ def get_databases(credentials: Credentials, subscription_id: str, server: Dict) 
     return databases
 
 
-@timeit
+@timing
 def load_server_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         details: List[Tuple[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]], update_tag: int,
@@ -381,7 +381,7 @@ def load_server_details(
     sync_database_details(neo4j_session, credentials, subscription_id, databases, update_tag)
 
 
-@timeit
+@timing
 def _load_server_dns_aliases(
         neo4j_session: neo4j.Session, dns_aliases: List[Dict], update_tag: int,
 ) -> None:
@@ -409,7 +409,7 @@ def _load_server_dns_aliases(
     )
 
 
-@timeit
+@timing
 def _load_server_ad_admins(
         neo4j_session: neo4j.Session, ad_admins: List[Dict], update_tag: int,
 ) -> None:
@@ -438,7 +438,7 @@ def _load_server_ad_admins(
     )
 
 
-@timeit
+@timing
 def _load_recoverable_databases(
         neo4j_session: neo4j.Session, recoverable_databases: List[Dict], update_tag: int,
 ) -> None:
@@ -468,7 +468,7 @@ def _load_recoverable_databases(
     )
 
 
-@timeit
+@timing
 def _load_restorable_dropped_databases(
         neo4j_session: neo4j.Session, restorable_dropped_databases: List[Dict], update_tag: int,
 ) -> None:
@@ -502,7 +502,7 @@ def _load_restorable_dropped_databases(
     )
 
 
-@timeit
+@timing
 def _load_failover_groups(
         neo4j_session: neo4j.Session, failover_groups: List[Dict], update_tag: int,
 ) -> None:
@@ -531,7 +531,7 @@ def _load_failover_groups(
     )
 
 
-@timeit
+@timing
 def _load_elastic_pools(
         neo4j_session: neo4j.Session, elastic_pools: List[Dict], update_tag: int,
 ) -> None:
@@ -564,7 +564,7 @@ def _load_elastic_pools(
     )
 
 
-@timeit
+@timing
 def _load_databases(
         neo4j_session: neo4j.Session, databases: List[Dict], update_tag: int,
 ) -> None:
@@ -603,7 +603,7 @@ def _load_databases(
     )
 
 
-@timeit
+@timing
 def sync_database_details(
         neo4j_session: neo4j.Session, credentials: Credentials,
         subscription_id: str, databases: List[Dict], update_tag: int,
@@ -612,7 +612,7 @@ def sync_database_details(
     load_database_details(neo4j_session, db_details, update_tag)  # type: ignore
 
 
-@timeit
+@timing
 def get_database_details(
         credentials: Credentials, subscription_id: str, databases: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -629,7 +629,7 @@ def get_database_details(
         ], replication_links, db_threat_detection_policies, restore_points, transparent_data_encryptions
 
 
-@timeit
+@timing
 def get_replication_links(credentials: Credentials, subscription_id: str, database: Dict) -> List[Dict]:
     """
     Returns the details of replication links in a database.
@@ -660,7 +660,7 @@ def get_replication_links(credentials: Credentials, subscription_id: str, databa
     return replication_links
 
 
-@timeit
+@timing
 def get_db_threat_detection_policies(credentials: Credentials, subscription_id: str, database: Dict) -> List[Dict]:
     """
     Returns the threat detection policy of a database.
@@ -686,7 +686,7 @@ def get_db_threat_detection_policies(credentials: Credentials, subscription_id: 
     return db_threat_detection_policies
 
 
-@timeit
+@timing
 def get_restore_points(credentials: Credentials, subscription_id: str, database: Dict) -> List[Dict]:
     """
     Returns the details of restore points in a database.
@@ -717,7 +717,7 @@ def get_restore_points(credentials: Credentials, subscription_id: str, database:
     return restore_points_list
 
 
-@timeit
+@timing
 def get_transparent_data_encryptions(credentials: Credentials, subscription_id: str, database: Dict) -> List[Dict]:
     """
     Returns the details of transparent data encryptions in a database.
@@ -743,7 +743,7 @@ def get_transparent_data_encryptions(credentials: Credentials, subscription_id: 
     return transparent_data_encryptions_list
 
 
-@timeit
+@timing
 def load_database_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any, Any, Any, Any]], update_tag: int,
 ) -> None:
@@ -780,7 +780,7 @@ def load_database_details(
     _load_transparent_data_encryptions(neo4j_session, encryptions_list, update_tag)
 
 
-@timeit
+@timing
 def _load_replication_links(
         neo4j_session: neo4j.Session, replication_links: List[Dict], update_tag: int,
 ) -> None:
@@ -818,7 +818,7 @@ def _load_replication_links(
     )
 
 
-@timeit
+@timing
 def _load_db_threat_detection_policies(
         neo4j_session: neo4j.Session, threat_detection_policies: List[Dict], update_tag: int,
 ) -> None:
@@ -855,7 +855,7 @@ def _load_db_threat_detection_policies(
     )
 
 
-@timeit
+@timing
 def _load_restore_points(
         neo4j_session: neo4j.Session, restore_points: List[Dict], update_tag: int,
 ) -> None:
@@ -886,7 +886,7 @@ def _load_restore_points(
     )
 
 
-@timeit
+@timing
 def _load_transparent_data_encryptions(
         neo4j_session: neo4j.Session, encryptions_list: List[Dict], update_tag: int,
 ) -> None:
@@ -915,14 +915,14 @@ def _load_transparent_data_encryptions(
     )
 
 
-@timeit
+@timing
 def cleanup_azure_sql_servers(
         neo4j_session: neo4j.Session, common_job_parameters: Dict,
 ) -> None:
     run_cleanup_job('azure_sql_server_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def sync(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         sync_tag: int, common_job_parameters: Dict,

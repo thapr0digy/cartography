@@ -8,7 +8,7 @@ from azure.mgmt.keyvault import KeyVaultManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +17,13 @@ def load_key_vaults(session: neo4j.Session, subscription_id: str, data_list: Lis
     session.write_transaction(_load_key_vaults_tx, subscription_id, data_list, update_tag)
 
 
-@timeit
+@timing
 def get_key_vaults_client(credentials: Credentials, subscription_id: str) -> KeyVaultManagementClient:
     client = KeyVaultManagementClient(credentials, subscription_id)
     return client
 
 
-@timeit
+@timing
 def get_key_vaults_list(client: KeyVaultManagementClient) -> List[Dict]:
     try:
         key_vaults_list = list(map(lambda x: x.as_dict(), client.vaults.list()))

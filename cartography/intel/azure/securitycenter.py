@@ -15,11 +15,11 @@ from azure.mgmt.security import SecurityCenter
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
-@timeit
+@timing
 def get_client(credentials: Credentials, subscription_id: str) -> SecurityCenter:
     """
     Getting the SecurityCenter client
@@ -27,7 +27,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> SecurityCenter
     client = SecurityCenter(credentials, subscription_id)
     return client
 
-@timeit
+@timing
 def get_sub_assessments_list(credentials: Credentials, subscription_id: str) -> List[Dict]:
     """
     Get a list of all assessments.
@@ -67,7 +67,7 @@ def get_sub_assessments_list(credentials: Credentials, subscription_id: str) -> 
 
     return sub_assessment_list
 
-@timeit
+@timing
 def transform_sub_assessment_data(sub_assessment_list: List[Dict]) -> List[Dict]:
     """
     Transforming the sub assessment response for neo4j ingestion.
@@ -82,7 +82,7 @@ def transform_sub_assessment_data(sub_assessment_list: List[Dict]) -> List[Dict]
     return sub_assessment_list
 
 
-@timeit
+@timing
 def load_sub_assessment_data(
         neo4j_session: neo4j.Session, subscription_id: str, sub_assessment_list: List[Dict], azure_update_tag: int,
 ) -> None:
@@ -114,7 +114,7 @@ def load_sub_assessment_data(
         azure_update_tag=azure_update_tag,
     )
 
-@timeit
+@timing
 def load_sub_assessment_data_resources(
     neo4j_session: neo4j.Session, subscription_id: str, sub_assessment_list: List[Dict], azure_update_tag: int,
 ) -> None:
@@ -132,7 +132,7 @@ def load_sub_assessment_data_resources(
         azure_update_tag=azure_update_tag,
     )
 
-@timeit
+@timing
 def create_chunked_sub_assessment_list(sub_assessment_list: List[Dict], chunk_size: int) -> List[Dict]:
     deque_obj = deque(sub_assessment_list)
     while deque_obj:
@@ -142,11 +142,11 @@ def create_chunked_sub_assessment_list(sub_assessment_list: List[Dict], chunk_si
                 chunk.append(deque_obj.popleft())
         yield chunk
 
-@timeit
+@timing
 def cleanup_azure_sub_assessments(neo4j_session: neo4j.Session, common_job_parameters: Dict) -> None:
     run_cleanup_job('azure_sub_assessment_cleanup.json', neo4j_session, common_job_parameters)
 
-@timeit
+@timing
 def sync(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         sync_tag: int, common_job_parameters: Dict,

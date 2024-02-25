@@ -8,7 +8,7 @@ from azure.mgmt.resource import ResourceManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +21,13 @@ def load_tags(session: neo4j.Session, data_list: List[Dict], update_tag: int) ->
     session.write_transaction(_load_tags_tx, data_list, update_tag)
 
 
-@timeit
+@timing
 def get_resource_management_client(credentials: Credentials, subscription_id: str) -> ResourceManagementClient:
     client = ResourceManagementClient(credentials, subscription_id)
     return client
 
 
-@timeit
+@timing
 def get_resource_groups_list(client: ResourceManagementClient) -> List[Dict]:
     try:
         resource_groups_list = list(map(lambda x: x.as_dict(), client.resource_groups.list()))
@@ -70,7 +70,7 @@ def cleanup_resource_groups(neo4j_session: neo4j.Session, common_job_parameters:
     run_cleanup_job('azure_import_resource_groups_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_tags_list(
     neo4j_session: neo4j.Session, client: ResourceManagementClient, resource_groups_list: List[Dict],
 ) -> List[Dict]:

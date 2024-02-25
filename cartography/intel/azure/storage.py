@@ -13,12 +13,12 @@ from azure.mgmt.storage import StorageManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
 
-@timeit
+@timing
 def get_client(credentials: Credentials, subscription_id: str) -> StorageManagementClient:
     """
     Getting the Azure Storage client
@@ -27,7 +27,7 @@ def get_client(credentials: Credentials, subscription_id: str) -> StorageManagem
     return client
 
 
-@timeit
+@timing
 def get_storage_account_list(credentials: Credentials, subscription_id: str) -> List[Dict]:
     """
     Getting the list of storage accounts
@@ -54,7 +54,7 @@ def get_storage_account_list(credentials: Credentials, subscription_id: str) -> 
     return storage_account_list
 
 
-@timeit
+@timing
 def load_storage_account_data(
         neo4j_session: neo4j.Session, subscription_id: str, storage_account_list: List[Dict],
         azure_update_tag: int,
@@ -94,7 +94,7 @@ def load_storage_account_data(
     )
 
 
-@timeit
+@timing
 def sync_storage_account_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         storage_account_list: List[Dict], sync_tag: int,
@@ -103,7 +103,7 @@ def sync_storage_account_details(
     load_storage_account_details(neo4j_session, credentials, subscription_id, details, sync_tag)
 
 
-@timeit
+@timing
 def get_storage_account_details(
         credentials: Credentials, subscription_id: str, storage_account_list: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -120,7 +120,7 @@ def get_storage_account_details(
         ], queue_services, table_services, file_services, blob_services
 
 
-@timeit
+@timing
 def get_queue_services(credentials: Credentials, subscription_id: str, storage_account: Dict) -> List[Dict]:
     """
     Gets the list of queue services.
@@ -144,7 +144,7 @@ def get_queue_services(credentials: Credentials, subscription_id: str, storage_a
     return queue_service_list
 
 
-@timeit
+@timing
 def get_table_services(credentials: Credentials, subscription_id: str, storage_account: Dict) -> List[Dict]:
     """
     Gets the list of table services.
@@ -168,7 +168,7 @@ def get_table_services(credentials: Credentials, subscription_id: str, storage_a
     return table_service_list
 
 
-@timeit
+@timing
 def get_file_services(credentials: Credentials, subscription_id: str, storage_account: Dict) -> List[Dict]:
     """
     Gets the list of file services.
@@ -192,7 +192,7 @@ def get_file_services(credentials: Credentials, subscription_id: str, storage_ac
     return file_service_list
 
 
-@timeit
+@timing
 def get_blob_services(credentials: Credentials, subscription_id: str, storage_account: Dict) -> List[Dict]:
     """
     Gets the list of blob services.
@@ -221,7 +221,7 @@ def get_blob_services(credentials: Credentials, subscription_id: str, storage_ac
     return blob_service_list
 
 
-@timeit
+@timing
 def load_storage_account_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         details: List[Tuple[Any, Any, Any, Any, Any, Any, Any]], update_tag: int,
@@ -274,7 +274,7 @@ def load_storage_account_details(
     sync_blob_services_details(neo4j_session, credentials, subscription_id, blob_services, update_tag)
 
 
-@timeit
+@timing
 def _load_queue_services(
         neo4j_session: neo4j.Session, queue_services: List[Dict], update_tag: int,
 ) -> None:
@@ -301,7 +301,7 @@ def _load_queue_services(
     )
 
 
-@timeit
+@timing
 def _load_table_services(
         neo4j_session: neo4j.Session, table_services: List[Dict], update_tag: int,
 ) -> None:
@@ -328,7 +328,7 @@ def _load_table_services(
     )
 
 
-@timeit
+@timing
 def _load_file_services(
         neo4j_session: neo4j.Session, file_services: List[Dict], update_tag: int,
 ) -> None:
@@ -355,7 +355,7 @@ def _load_file_services(
     )
 
 
-@timeit
+@timing
 def _load_blob_services(
         neo4j_session: neo4j.Session, blob_services: List[Dict], update_tag: int,
 ) -> None:
@@ -382,7 +382,7 @@ def _load_blob_services(
     )
 
 
-@timeit
+@timing
 def sync_queue_services_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         queue_services: List[Dict], update_tag: int,
@@ -391,7 +391,7 @@ def sync_queue_services_details(
     load_queue_services_details(neo4j_session, queue_services_details, update_tag)
 
 
-@timeit
+@timing
 def get_queue_services_details(
         credentials: Credentials, subscription_id: str, queue_services: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -403,7 +403,7 @@ def get_queue_services_details(
         yield queue_service['id'], queues
 
 
-@timeit
+@timing
 def get_queues(credentials: Credentials, subscription_id: str, queue_service: Dict) -> List[Dict]:
     """
     Getting the queues from the queue service.
@@ -432,7 +432,7 @@ def get_queues(credentials: Credentials, subscription_id: str, queue_service: Di
     return queues
 
 
-@timeit
+@timing
 def load_queue_services_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int,
 ) -> None:
@@ -450,7 +450,7 @@ def load_queue_services_details(
     _load_queues(neo4j_session, queues, update_tag)
 
 
-@timeit
+@timing
 def _load_queues(neo4j_session: neo4j.Session, queues: List[Dict], update_tag: int) -> None:
     """
     Ingest Queue details into neo4j.
@@ -475,7 +475,7 @@ def _load_queues(neo4j_session: neo4j.Session, queues: List[Dict], update_tag: i
     )
 
 
-@timeit
+@timing
 def sync_table_services_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         table_services: List[Dict], update_tag: int,
@@ -484,7 +484,7 @@ def sync_table_services_details(
     load_table_services_details(neo4j_session, table_services_details, update_tag)
 
 
-@timeit
+@timing
 def get_table_services_details(
         credentials: Credentials, subscription_id: str, table_services: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -496,7 +496,7 @@ def get_table_services_details(
         yield table_service['id'], tables
 
 
-@timeit
+@timing
 def get_tables(credentials: Credentials, subscription_id: str, table_service: Dict) -> List[Dict]:
     """
     Getting the tables from the table service.
@@ -525,7 +525,7 @@ def get_tables(credentials: Credentials, subscription_id: str, table_service: Di
     return tables
 
 
-@timeit
+@timing
 def load_table_services_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int,
 ) -> None:
@@ -543,7 +543,7 @@ def load_table_services_details(
     _load_tables(neo4j_session, tables, update_tag)
 
 
-@timeit
+@timing
 def _load_tables(neo4j_session: neo4j.Session, tables: List[Dict], update_tag: int) -> None:
     """
     Ingest Table details into neo4j.
@@ -569,7 +569,7 @@ def _load_tables(neo4j_session: neo4j.Session, tables: List[Dict], update_tag: i
     )
 
 
-@timeit
+@timing
 def sync_file_services_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         file_services: List[Dict], update_tag: int,
@@ -578,7 +578,7 @@ def sync_file_services_details(
     load_file_services_details(neo4j_session, file_services_details, update_tag)
 
 
-@timeit
+@timing
 def get_file_services_details(
         credentials: Credentials, subscription_id: str, file_services: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -590,7 +590,7 @@ def get_file_services_details(
         yield file_service['id'], shares
 
 
-@timeit
+@timing
 def get_shares(credentials: Credentials, subscription_id: str, file_service: Dict) -> List[Dict]:
     """
     Getting the shares from the file service.
@@ -619,7 +619,7 @@ def get_shares(credentials: Credentials, subscription_id: str, file_service: Dic
     return shares
 
 
-@timeit
+@timing
 def load_file_services_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int,
 ) -> None:
@@ -637,7 +637,7 @@ def load_file_services_details(
     _load_shares(neo4j_session, shares, update_tag)
 
 
-@timeit
+@timing
 def _load_shares(neo4j_session: neo4j.Session, shares: List[Dict], update_tag: int) -> None:
     """
     Ingest Share details into neo4j.
@@ -673,7 +673,7 @@ def _load_shares(neo4j_session: neo4j.Session, shares: List[Dict], update_tag: i
     )
 
 
-@timeit
+@timing
 def sync_blob_services_details(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         blob_services: List[Dict], update_tag: int,
@@ -682,7 +682,7 @@ def sync_blob_services_details(
     load_blob_services_details(neo4j_session, blob_services_details, update_tag)
 
 
-@timeit
+@timing
 def get_blob_services_details(
         credentials: Credentials, subscription_id: str, blob_services: List[Dict],
 ) -> Generator[Any, Any, Any]:
@@ -694,7 +694,7 @@ def get_blob_services_details(
         yield blob_service['id'], blob_containers
 
 
-@timeit
+@timing
 def get_blob_containers(credentials: Credentials, subscription_id: str, blob_service: Dict) -> List[Dict]:
     """
     Getting the blob containers from the blob service.
@@ -724,7 +724,7 @@ def get_blob_containers(credentials: Credentials, subscription_id: str, blob_ser
     return blob_containers
 
 
-@timeit
+@timing
 def load_blob_services_details(
         neo4j_session: neo4j.Session, details: List[Tuple[Any, Any]], update_tag: int,
 ) -> None:
@@ -742,7 +742,7 @@ def load_blob_services_details(
     _load_blob_containers(neo4j_session, blob_containers, update_tag)
 
 
-@timeit
+@timing
 def _load_blob_containers(
         neo4j_session: neo4j.Session, blob_containers: List[Dict], update_tag: int,
 ) -> None:
@@ -781,14 +781,14 @@ def _load_blob_containers(
     )
 
 
-@timeit
+@timing
 def cleanup_azure_storage_accounts(
         neo4j_session: neo4j.Session, common_job_parameters: Dict,
 ) -> None:
     run_cleanup_job('azure_storage_account_cleanup.json', neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def sync(
         neo4j_session: neo4j.Session, credentials: Credentials, subscription_id: str,
         sync_tag: int, common_job_parameters: Dict,

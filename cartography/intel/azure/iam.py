@@ -9,7 +9,7 @@ from azure.mgmt.authorization import AuthorizationManagementClient
 
 from .util.credentials import Credentials
 from cartography.util import run_cleanup_job
-from cartography.util import timeit
+from cartography.util import timeit, timing
 
 logger = logging.getLogger(__name__)
 
@@ -40,19 +40,19 @@ def load_tenant_domains(session: neo4j.Session, tenant_id: str, data_list: List[
     session.write_transaction(_load_tenant_domains_tx, tenant_id, data_list, update_tag)
 
 
-@timeit
+@timing
 def get_graph_client(credentials: Credentials, tenant_id: str) -> GraphRbacManagementClient:
     client = GraphRbacManagementClient(credentials, tenant_id)
     return client
 
 
-@timeit
+@timing
 def get_authorization_client(credentials: Credentials, subscription_id: str) -> AuthorizationManagementClient:
     client = AuthorizationManagementClient(credentials, subscription_id)
     return client
 
 
-@timeit
+@timing
 def get_tenant_users_list(client: GraphRbacManagementClient, tenant_id: str) -> List[Dict]:
     try:
         tenant_users_list = list(
@@ -116,7 +116,7 @@ def sync_tenant_users(
     cleanup_tenant_users(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_tenant_groups_list(client: GraphRbacManagementClient, tenant_id: str) -> List[Dict]:
     try:
         tenant_groups_list = list(map(lambda x: x.as_dict(), client.groups.list()))
@@ -175,7 +175,7 @@ def sync_tenant_groups(
     cleanup_tenant_groups(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_tenant_applications_list(client: GraphRbacManagementClient, tenant_id: str) -> List[Dict]:
     try:
         tenant_applications_list = list(map(lambda x: x.as_dict(), client.applications.list()))
@@ -232,7 +232,7 @@ def sync_tenant_applications(
     cleanup_tenant_applications(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_tenant_service_accounts_list(client: GraphRbacManagementClient, tenant_id: str) -> List[Dict]:
     try:
         tenant_service_accounts_list = list(
@@ -292,7 +292,7 @@ def sync_tenant_service_accounts(
     cleanup_tenant_service_accounts(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_tenant_domains_list(client: GraphRbacManagementClient, tenant_id: str) -> List[Dict]:
     try:
         tenant_domains_list = list(map(lambda x: x.as_dict(), client.domains.list()))
@@ -350,7 +350,7 @@ def sync_tenant_domains(
     cleanup_tenant_domains(neo4j_session, common_job_parameters)
 
 
-@timeit
+@timing
 def get_roles_list(client: AuthorizationManagementClient) -> List[Dict]:
     try:
         roles_list = list(
